@@ -1,54 +1,14 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>G-Collection Avatar Simulation</title>
-    <style>
-        /* [디자인] 깔끔하고 전문적인 시뮬레이션 UI */
-        body { margin: 0; font-family: 'Malgun Gothic', sans-serif; background: #f4f7f9; color: #333; }
-        .main-container { display: flex; gap: 20px; padding: 25px; max-width: 1300px; margin: 0 auto; height: 90vh; }
-        
-        /* 왼쪽 메인 화면 */
-        .avatar-display { flex: 1.5; background: #ffffff; border-radius: 20px; padding: 30px; text-align: center; box-shadow: 0 8px 25px rgba(0,0,0,0.08); display: flex; flex-direction: column; }
-        #main-avatar-frame { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fbfbfb; border: 1px solid #eee; border-radius: 15px; overflow: hidden; }
-        #current-avatar { width: 100%; height: 100%; object-fit: contain; transition: opacity 0.3s ease; }
-        
-        /* 오른쪽 스타일 리스트 */
-        .style-sidebar { flex: 0.8; background: #ffffff; padding: 25px; border-radius: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.08); overflow-y: auto; }
-        .style-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
-        
-        .style-item { border: 2px solid #f0f0f0; border-radius: 12px; cursor: pointer; transition: 0.3s; overflow: hidden; background: #fff; }
-        .style-item:hover { border-color: #4a90e2; transform: translateY(-2px); }
-        .style-item.active { border-color: #4a90e2; background: #eef6ff; }
-        
-        .style-item img { width: 100%; height: 150px; object-fit: cover; display: block; }
-        .style-item span { display: block; font-size: 15px; font-weight: bold; padding: 12px; text-align: center; }
-
-        /* 하단 버튼 */
-        .apply-btn { margin-top: 25px; padding: 18px; background: #3478f6; color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .apply-btn:hover { background: #2359c4; }
-        .label { margin: 10px 0; color: #aaa; font-size: 12px; font-weight: bold; letter-spacing: 3px; }
-    </style>
-</head>
-<body>
-
-<div class="main-container">
-    <div class="avatar-display">
-        <div id="main-avatar-frame">
-            <img id="current-avatar" src="style1.jpg" alt="Main Avatar">
-        </div>
-        <p class="label">MAIN VIEW</p>
-        <button class="apply-btn" onclick="applySelection()">최종 적용하기</button>
+<div class="main-avatar-container">
+    <div class="avatar-header">Main Avatar</div>
+    <div id="mainView" class="main-view">
+        <img id="currentAvatar" src="assets/default_avatar.png" alt="Main Avatar">
     </div>
-
-    <div class="style-sidebar">
-        <h3 style="margin-top:0; border-bottom:2px solid #f4f4f4; padding-bottom:15px;">스타일 추천 (8)</h3>
-        <div id="style-grid" class="style-grid">
-            </div>
-    </div>
+    <div class="view-label">MAIN VIEW</div>
+    <button id="applyBtn" class="final-apply-btn">최종 적용하기</button>
 </div>
 
-<script src="새로운 1.js"></script>
-</body>
-</html>
+<div class="style-recommendation">
+    <h3>스타일 추천 (8)</h3>
+    <div id="styleList" class="style-list">
+        </div>
+</div>
