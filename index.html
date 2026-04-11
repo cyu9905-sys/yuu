@@ -1,14 +1,27 @@
-<div class="main-avatar-container">
-    <div class="avatar-header">Main Avatar</div>
-    <div id="mainView" class="main-view">
-        <img id="currentAvatar" src="assets/default_avatar.png" alt="Main Avatar">
-    </div>
-    <div class="view-label">MAIN VIEW</div>
-    <button id="applyBtn" class="final-apply-btn">최종 적용하기</button>
-</div>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Clothing Simulator</title>
+    <style>
+        body { margin: 0; display: flex; flex-direction: column; align-items: center; background: #f0f0f0; font-family: sans-serif; }
+        #canvas-container { width: 100%; max-width: 800px; height: 500px; background: #fff; margin-top: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); position: relative; overflow: hidden; }
+        .controls { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; padding: 10px; }
+        .style-item { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; transition: opacity 0.3s; }
+        .style-item:hover { opacity: 0.8; }
+        .error-msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: red; display: none; }
+    </style>
+</head>
+<body>
 
-<div class="style-recommendation">
-    <h3>스타일 추천 (8)</h3>
-    <div id="styleList" class="style-list">
+    <div id="canvas-container">
+        <div id="error-msg" class="error-msg">이미지를 불러올 수 없습니다.</div>
         </div>
-</div>
+
+    <div class="controls" id="style-controls">
+        </div>
+
+    <script src="1.js"></script>
+</body>
+</html>
