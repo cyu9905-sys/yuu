@@ -1,4 +1,6 @@
-// 1. 스타일 데이터 정의 (G-Collection 이미지 파일명에 맞게 수정하세요)
+// [주의] 이 파일은 '새로운 1.js' 자바스크립트 파일입니다. HTML 태그(<script> 등)를 포함하면 안 됩니다.
+
+// 1. 스타일 데이터 정의 (실제 이미지 파일명과 동일하게 대소문자를 구분하여 수정하세요)
 const styleList = [
     { id: 1, name: "미니멀 룩", img: "style1.jpg", thumb: "style1_thumb.jpg" },
     { id: 2, name: "어반 스타일", img: "style2.jpg", thumb: "style2_thumb.jpg" },
@@ -12,7 +14,13 @@ const styleList = [
 
 // 2. 화면 초기화 함수
 document.addEventListener('DOMContentLoaded', () => {
-    renderStyles();
+    // HTML에 'style-grid' ID를 가진 요소가 있는지 확인 후 실행
+    const gridCheck = document.getElementById('style-grid');
+    if (gridCheck) {
+        renderStyles();
+    } else {
+        console.error("오류: index.html에 ID가 'style-grid'인 div 요소가 없습니다.");
+    }
 });
 
 // 3. 사이드바에 스타일 리스트 생성
@@ -29,28 +37,36 @@ function renderStyles() {
 // 4. 메인 아바타 이미지 변경 함수
 function changeStyle(imagePath, id) {
     const mainAvatar = document.getElementById('current-avatar');
-    
+    if (!mainAvatar) return;
+
     // 기존 선택 표시 제거 및 새 선택 표시
     document.querySelectorAll('.style-item').forEach(el => el.classList.remove('active'));
-    document.getElementById(`item-${id}`).classList.add('active');
+    const selectedItem = document.getElementById(`item-${id}`);
+    if (selectedItem) selectedItem.classList.add('active');
 
-    // 페이드 효과
+    // 페이드 효과 (부드럽게 변경)
     mainAvatar.style.opacity = 0.3;
     
     // 이미지 로드 시점 조절
     setTimeout(() => {
         mainAvatar.src = imagePath;
         mainAvatar.onload = () => {
+            mainAvatar.style.opacity = 1; // 로드 완료 시 밝게
+        };
+        // 이미지 로드 실패 시 예외 처리
+        mainAvatar.onerror = () => {
             mainAvatar.style.opacity = 1;
+            mainAvatar.src = 'https://via.placeholder.com/500x700?text=Image+Not+Found';
         };
     }, 150);
 }
 
 // 5. 최종 적용 버튼 클릭 시
 function applySelection() {
-    const currentImg = document.getElementById('current-avatar').src;
-    alert("선택하신 스타일이 시뮬레이션에 적용되었습니다!");
-    console.log("적용된 이미지:", currentImg);
-	
+    const mainAvatar = document.getElementById('current-avatar');
+    if (!mainAvatar) return;
+    
+    const currentImg = mainAvatar.src;
+    alert("선택하신 스타일이 시뮬레이션에 최종 적용되었습니다!");
+    console.log("최종 적용된 이미지 경로:", currentImg);
 }
-<script src="새로운 1.js"></script>
