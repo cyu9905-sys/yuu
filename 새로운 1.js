@@ -1,19 +1,54 @@
-// 스타일 변경 함수
-function changeStyle(imagePath) {
+// 1. 스타일 데이터 정의 (G-Collection 이미지 파일명에 맞게 수정하세요)
+const styleList = [
+    { id: 1, name: "미니멀 룩", img: "style1.jpg", thumb: "style1_thumb.jpg" },
+    { id: 2, name: "어반 스타일", img: "style2.jpg", thumb: "style2_thumb.jpg" },
+    { id: 3, name: "오피스 룩", img: "office_full.jpg", thumb: "office_thumb.jpg" },
+    { id: 4, name: "캐주얼 룩", img: "casual_full.jpg", thumb: "casual_thumb.jpg" },
+    { id: 5, name: "스트릿 패션", img: "street_full.jpg", thumb: "street_thumb.jpg" },
+    { id: 6, name: "모던 클래식", img: "modern_full.jpg", thumb: "modern_thumb.jpg" },
+    { id: 7, name: "스포티 룩", img: "sporty_full.jpg", thumb: "sporty_thumb.jpg" },
+    { id: 8, name: "데일리 룩", img: "daily_full.jpg", thumb: "daily_thumb.jpg" }
+];
+
+// 2. 화면 초기화 함수
+document.addEventListener('DOMContentLoaded', () => {
+    renderStyles();
+});
+
+// 3. 사이드바에 스타일 리스트 생성
+function renderStyles() {
+    const grid = document.getElementById('style-grid');
+    grid.innerHTML = styleList.map(style => `
+        <div class="style-item" id="item-${style.id}" onclick="changeStyle('${style.img}', ${style.id})">
+            <img src="${style.thumb}" alt="${style.name}" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+            <span>${style.name}</span>
+        </div>
+    `).join('');
+}
+
+// 4. 메인 아바타 이미지 변경 함수
+function changeStyle(imagePath, id) {
     const mainAvatar = document.getElementById('current-avatar');
     
-    // 페이드 효과와 함께 이미지 교체
-    mainAvatar.style.opacity = 0.5;
+    // 기존 선택 표시 제거 및 새 선택 표시
+    document.querySelectorAll('.style-item').forEach(el => el.classList.remove('active'));
+    document.getElementById(`item-${id}`).classList.add('active');
+
+    // 페이드 효과
+    mainAvatar.style.opacity = 0.3;
     
+    // 이미지 로드 시점 조절
     setTimeout(() => {
         mainAvatar.src = imagePath;
-        mainAvatar.style.opacity = 1;
+        mainAvatar.onload = () => {
+            mainAvatar.style.opacity = 1;
+        };
     }, 150);
 }
 
-// 8개 스타일 데이터를 배열로 관리하면 편리합니다
-const styleList = [
-    { id: 1, name: "오피스 룩", img: "office_full.jpg", thumb: "office_thumb.jpg" },
-    { id: 2, name: "캐주얼 룩", img: "casual_full.jpg", thumb: "casual_thumb.jpg" },
-    // 추가적인 8개 스타일 정의...
-];
+// 5. 최종 적용 버튼 클릭 시
+function applySelection() {
+    const currentImg = document.getElementById('current-avatar').src;
+    alert("선택하신 스타일이 시뮬레이션에 적용되었습니다!");
+    console.log("적용된 이미지:", currentImg);
+}
