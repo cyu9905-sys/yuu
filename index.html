@@ -1,88 +1,245 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>제니 AI 옷입히기 - 드래그 앤 드롭</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D 의상 시뮬레이터 - G-Collection</title>
     <style>
-        body { background-color: #fff0f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: 'Pretendard', sans-serif; }
-        .game-wrapper { width: 800px; height: 600px; display: flex; background: white; border-radius: 30px; padding: 20px; box-shadow: 0 20px 50px rgba(255,105,180,0.3); border: 5px solid #ffb6c1; }
-        
-        /* 왼쪽: 캐릭터 배치 영역 */
-        .drop-zone { flex: 1; position: relative; display: flex; justify-content: center; align-items: center; background: #fff5f7; border-radius: 20px; border: 3px dashed #ffc0cb; transition: 0.3s; }
-        .drop-zone.drag-over { background: #ffe4e1; border-color: #ff69b4; transform: scale(1.02); }
-        #mainAvatar { height: 90%; border-radius: 15px; pointer-events: none; }
-        .drop-label { position: absolute; bottom: 10px; color: #ff69b4; font-weight: bold; }
+        :root {
+            --primary-color: #4A90E2;
+            --success-color: #2ECC71;
+            --bg-color: #f8f9fa;
+            --card-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
 
-        /* 오른쪽: 옷장(드래그할 아이템들) */
-        .closet { width: 300px; padding-left: 20px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr); gap: 15px; }
-        .drag-item { border: 2px solid #eee; border-radius: 15px; cursor: grab; overflow: hidden; display: flex; flex-direction: column; align-items: center; background: #fff; transition: 0.2s; }
-        .drag-item:active { cursor: grabbing; opacity: 0.7; }
-        .drag-item:hover { border-color: #ff69b4; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .drag-item img { width: 100%; height: 80%; object-fit: cover; }
-        .drag-item span { font-size: 12px; padding: 5px; color: #666; }
+        body {
+            margin: 0;
+            font-family: 'Pretendard', sans-serif;
+            display: flex;
+            height: 100vh;
+            background-color: var(--bg-color);
+        }
+
+        /* 메인 뷰어 영역 */
+        .main-viewer {
+            flex: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #e0e0e0; /* 3D 모델 들어갈 자리 */
+        }
+
+        /* 1. 로딩 중 표시 */
+        #loading-overlay {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.7);
+            z-index: 10;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .spinner {
+            width: 50px; height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* 2. 업로드 성공 표시 (Toast) */
+        #upload-toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: var(--success-color);
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            position: fixed;
+            z-index: 20;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        #upload-toast.show {
+            visibility: visible;
+            animation: fadeInOut 2.5s;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; top: 0; }
+            20% { opacity: 1; top: 30px; }
+            80% { opacity: 1; top: 30px; }
+            100% { opacity: 0; top: 0; }
+        }
+
+        /* 3. 적용 완료 버튼 */
+        .bottom-controls {
+            position: absolute;
+            bottom: 40px;
+        }
+        .apply-final-btn {
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.3s;
+            box-shadow: 0 4px 10px rgba(74, 144, 226, 0.4);
+        }
+        .apply-final-btn:hover {
+            background-color: #357ABD;
+            transform: translateY(-2px);
+        }
+
+        /* 스타일 사이드바 영역 */
+        .style-sidebar {
+            width: 320px;
+            background: white;
+            padding: 20px;
+            overflow-y: auto;
+            border-left: 1px solid #ddd;
+        }
+
+        .sidebar-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        /* 스타일 카드 디자인 */
+        .style-card {
+            background: #fff;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: var(--card-shadow);
+        }
+
+        /* 마우스 올렸을 때 확대 */
+        .style-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        /* 선택된 카드 테두리 강조 */
+        .style-card.selected {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 10px rgba(74, 144, 226, 0.5);
+        }
+
+        .style-card img {
+            width: 100%; height: 180px;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .style-name { font-weight: 600; font-size: 16px; }
+
+        /* 적용하기 버튼 */
+        .card-apply-btn {
+            background: #f0f0f0;
+            border: none;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .card-apply-btn:hover { background: #e0e0e0; }
+
+        .upload-input-section { margin-bottom: 30px; }
     </style>
 </head>
 <body>
 
-<div class="game-wrapper">
-    <div class="drop-zone" id="dropZone" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
-        <img id="mainAvatar" src="EF411M.jpg" alt="Jenny">
-        <div class="drop-label">여기에 옷을 끌어다 놓으세요!</div>
-    </div>
+    <div class="main-viewer">
+        <div id="loading-overlay">
+            <div class="spinner"></div>
+            <p style="margin-top: 15px; font-weight: 600;">의상을 처리 중입니다...</p>
+        </div>
 
-    <div class="closet">
-        <div class="drag-item" draggable="true" ondragstart="drag(event)" data-img="EF259M.jpg">
-            <img src="EF259M.jpg"><span>캐주얼</span>
-        </div>
-        <div class="drag-item" draggable="true" ondragstart="drag(event)" data-img="EF300M.jpg">
-            <img src="EF300M.jpg"><span>오피스 룩</span>
-        </div>
-        <div class="drag-item" draggable="true" ondragstart="drag(event)" data-img="EF330M.jpg">
-            <img src="EF330M.jpg"><span>이브닝 드레스</span>
-        </div>
-        <div class="drag-item" draggable="true" ondragstart="drag(event)" data-img="EF350M.jpg">
-            <img src="EF350M.jpg"><span>액티브웨어</span>
-        </div>
-        <div class="drag-item" draggable="true" ondragstart="drag(event)" data-img="EF358M.jpg">
-            <img src="EF358M.jpg"><span>프레피 룩</span>
-        </div>
-        <div class="drag-item" draggable="true" ondragstart="drag(event)" data-img="EF369M.jpg">
-            <img src="EF369M.jpg"><span>윈터 레이어드</span>
+        <div id="upload-toast">✅ 의상 업로드 및 분석 성공!</div>
+
+        <div style="font-size: 24px; color: #888;">[ 3D 모델 미리보기 영역 ]</div>
+
+        <div class="bottom-controls">
+            <button class="apply-final-btn" onclick="alert('전체 설정이 저장되었습니다!')">적용 완료</button>
         </div>
     </div>
-</div>
 
-<script>
-    function allowDrop(ev) {
-        ev.preventDefault();
-        document.getElementById('dropZone').classList.add('drag-over');
-    }
+    <div class="style-sidebar">
+        <div class="sidebar-title">스타일 추천</div>
 
-    function dragLeave(ev) {
-        document.getElementById('dropZone').classList.remove('drag-over');
-    }
+        <div class="upload-input-section">
+            <label for="cloth-upload" style="display:block; margin-bottom:8px; font-size:14px; color:#666;">새 의상 등록</label>
+            <input type="file" id="cloth-upload" onchange="simulateUpload()">
+        </div>
 
-    function drag(ev) {
-        ev.dataTransfer.setData("newImg", ev.currentTarget.getAttribute('data-img'));
-    }
+        <div class="style-card selected" onclick="selectCard(this)">
+            <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400" alt="Style 1">
+            <div class="card-content">
+                <span class="style-name">미니멀 캐주얼 룩</span>
+                <button class="card-apply-btn">적용하기</button>
+            </div>
+        </div>
 
-    function drop(ev) {
-        ev.preventDefault();
-        document.getElementById('dropZone').classList.remove('drag-over');
-        
-        const newImgUrl = ev.dataTransfer.getData("newImg");
-        const avatar = document.getElementById('mainAvatar');
-        
-        avatar.style.transition = "0.3s";
-        avatar.style.opacity = "0";
-        
-        setTimeout(() => {
-            avatar.src = newImgUrl;
-            avatar.style.opacity = "1";
-        }, 300);
-    }
-</script>
+        <div class="style-card" onclick="selectCard(this)">
+            <img src="https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400" alt="Style 2">
+            <div class="card-content">
+                <span class="style-name">어반 비즈니스 룩</span>
+                <button class="card-apply-btn">적용하기</button>
+            </div>
+        </div>
+    </div>
 
+    <script>
+        // 업로드 시뮬레이션 기능
+        function simulateUpload() {
+            const loading = document.getElementById('loading-overlay');
+            const toast = document.getElementById('upload-toast');
+            
+            // 로딩 표시 시작
+            loading.style.display = 'flex';
+
+            // 2초 뒤 완료 처리
+            setTimeout(() => {
+                loading.style.display = 'none';
+                
+                // 성공 토스트 표시
+                toast.className = "show";
+                setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2500);
+            }, 2000);
+        }
+
+        // 스타일 카드 선택 기능
+        function selectCard(element) {
+            // 기존 선택 제거
+            document.querySelectorAll('.style-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            // 새 카드 선택
+            element.classList.add('selected');
+        }
+    </script>
 </body>
 </html>
