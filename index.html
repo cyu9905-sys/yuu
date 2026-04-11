@@ -1,72 +1,52 @@
-// [주의] 이 파일은 '새로운 1.js' 자바스크립트 파일입니다. HTML 태그(<script> 등)를 포함하면 안 됩니다.
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>G-Collection Avatar Simulation</title>
+    <style>
+        body { margin: 0; font-family: 'Pretendard', sans-serif; background: #f0f2f5; }
+        .main-container { display: flex; gap: 20px; padding: 20px; max-width: 1200px; margin: 0 auto; }
+        
+        /* 왼쪽 아바타 영역 */
+        .avatar-display { flex: 2; background: #fff; border-radius: 20px; padding: 30px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        #main-avatar-frame { min-height: 600px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fafafa; border-radius: 15px; }
+        #current-avatar { width: 100%; max-width: 500px; border-radius: 10px; transition: opacity 0.3s ease; }
+        
+        /* 오른쪽 스타일 리스트 영역 */
+        .style-sidebar { flex: 1; background: #fff; padding: 20px; border-radius: 20px; height: 85vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .style-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        
+        .style-item { border: 2px solid #eee; border-radius: 15px; cursor: pointer; transition: 0.3s; overflow: hidden; }
+        .style-item:hover { border-color: #4a90e2; transform: translateY(-3px); }
+        .style-item.active { border-color: #4a90e2; background: #f0f7ff; }
+        
+        .style-item img { width: 100%; height: 180px; object-fit: cover; display: block; }
+        .style-item span { display: block; font-size: 15px; font-weight: 600; padding: 12px; text-align: center; }
 
-// 1. 스타일 데이터 정의 (실제 이미지 파일명과 동일하게 대소문자를 구분하여 수정하세요)
-const styleList = [
-    { id: 1, name: "미니멀 룩", img: "style1.jpg", thumb: "style1_thumb.jpg" },
-    { id: 2, name: "어반 스타일", img: "style2.jpg", thumb: "style2_thumb.jpg" },
-    { id: 3, name: "오피스 룩", img: "office_full.jpg", thumb: "office_thumb.jpg" },
-    { id: 4, name: "캐주얼 룩", img: "casual_full.jpg", thumb: "casual_thumb.jpg" },
-    { id: 5, name: "스트릿 패션", img: "street_full.jpg", thumb: "street_thumb.jpg" },
-    { id: 6, name: "모던 클래식", img: "modern_full.jpg", thumb: "modern_thumb.jpg" },
-    { id: 7, name: "스포티 룩", img: "sporty_full.jpg", thumb: "sporty_thumb.jpg" },
-    { id: 8, name: "데일리 룩", img: "daily_full.jpg", thumb: "daily_thumb.jpg" }
-];
+        .apply-btn { margin-top: 25px; padding: 18px 80px; background: #4a90e2; color: white; border: none; border-radius: 35px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .apply-btn:hover { background: #357abd; box-shadow: 0 5px 15px rgba(74,144,226,0.4); }
+        .label { margin-top: 15px; color: #bbb; font-weight: bold; font-size: 12px; letter-spacing: 2px; }
+    </style>
+</head>
+<body>
 
-// 2. 화면 초기화 함수
-document.addEventListener('DOMContentLoaded', () => {
-    // HTML에 'style-grid' ID를 가진 요소가 있는지 확인 후 실행
-    const gridCheck = document.getElementById('style-grid');
-    if (gridCheck) {
-        renderStyles();
-    } else {
-        console.error("오류: index.html에 ID가 'style-grid'인 div 요소가 없습니다.");
-    }
-});
-
-// 3. 사이드바에 스타일 리스트 생성
-function renderStyles() {
-    const grid = document.getElementById('style-grid');
-    grid.innerHTML = styleList.map(style => `
-        <div class="style-item" id="item-${style.id}" onclick="changeStyle('${style.img}', ${style.id})">
-            <img src="${style.thumb}" alt="${style.name}" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
-            <span>${style.name}</span>
+<div class="main-container">
+    <div class="avatar-display">
+        <div id="main-avatar-frame">
+            <img id="current-avatar" src="style1.jpg" alt="Main Avatar" onerror="this.src='https://via.placeholder.com/500x700?text=G-Collection+Avatar'">
+            <p class="label">MAIN VIEW</p>
         </div>
-    `).join('');
-}
+        <button class="apply-btn" onclick="applySelection()">최종 적용하기</button>
+    </div>
 
-// 4. 메인 아바타 이미지 변경 함수
-function changeStyle(imagePath, id) {
-    const mainAvatar = document.getElementById('current-avatar');
-    if (!mainAvatar) return;
+    <div class="style-sidebar">
+        <h3 style="margin-bottom:20px; color:#333;">스타일 추천 (8)</h3>
+        <div id="style-grid" class="style-grid">
+            </div>
+    </div>
+</div>
 
-    // 기존 선택 표시 제거 및 새 선택 표시
-    document.querySelectorAll('.style-item').forEach(el => el.classList.remove('active'));
-    const selectedItem = document.getElementById(`item-${id}`);
-    if (selectedItem) selectedItem.classList.add('active');
-
-    // 페이드 효과 (부드럽게 변경)
-    mainAvatar.style.opacity = 0.3;
-    
-    // 이미지 로드 시점 조절
-    setTimeout(() => {
-        mainAvatar.src = imagePath;
-        mainAvatar.onload = () => {
-            mainAvatar.style.opacity = 1; // 로드 완료 시 밝게
-        };
-        // 이미지 로드 실패 시 예외 처리
-        mainAvatar.onerror = () => {
-            mainAvatar.style.opacity = 1;
-            mainAvatar.src = 'https://via.placeholder.com/500x700?text=Image+Not+Found';
-        };
-    }, 150);
-}
-
-// 5. 최종 적용 버튼 클릭 시
-function applySelection() {
-    const mainAvatar = document.getElementById('current-avatar');
-    if (!mainAvatar) return;
-    
-    const currentImg = mainAvatar.src;
-    alert("선택하신 스타일이 시뮬레이션에 최종 적용되었습니다!");
-    console.log("최종 적용된 이미지 경로:", currentImg);
-}
+<script src="새로운 1.js"></script>
+</body>
+</html>

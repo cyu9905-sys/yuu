@@ -1,4 +1,4 @@
-// 1. 스타일 데이터 정의 (G-Collection 이미지 파일명에 맞게 수정하세요)
+// 스타일 데이터 정의
 const styleList = [
     { id: 1, name: "미니멀 룩", img: "style1.jpg", thumb: "style1_thumb.jpg" },
     { id: 2, name: "어반 스타일", img: "style2.jpg", thumb: "style2_thumb.jpg" },
@@ -10,45 +10,48 @@ const styleList = [
     { id: 8, name: "데일리 룩", img: "daily_full.jpg", thumb: "daily_thumb.jpg" }
 ];
 
-// 2. 화면 초기화 함수
+// 페이지가 로드되면 실행
 document.addEventListener('DOMContentLoaded', () => {
     renderStyles();
 });
 
-// 3. 사이드바에 스타일 리스트 생성
+// 사이드바 리스트 생성 함수
 function renderStyles() {
     const grid = document.getElementById('style-grid');
+    if(!grid) return;
+
     grid.innerHTML = styleList.map(style => `
         <div class="style-item" id="item-${style.id}" onclick="changeStyle('${style.img}', ${style.id})">
-            <img src="${style.thumb}" alt="${style.name}" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+            <img src="${style.thumb}" alt="${style.name}" onerror="this.src='https://via.placeholder.com/150?text=Image'">
             <span>${style.name}</span>
         </div>
     `).join('');
 }
 
-// 4. 메인 아바타 이미지 변경 함수
+// 메인 이미지 변경 함수
 function changeStyle(imagePath, id) {
     const mainAvatar = document.getElementById('current-avatar');
-    
-    // 기존 선택 표시 제거 및 새 선택 표시
-    document.querySelectorAll('.style-item').forEach(el => el.classList.remove('active'));
-    document.getElementById(`item-${id}`).classList.add('active');
+    if (!mainAvatar) return;
 
-    // 페이드 효과
-    mainAvatar.style.opacity = 0.3;
+    // 선택 효과 적용
+    document.querySelectorAll('.style-item').forEach(el => el.classList.remove('active'));
+    const targetItem = document.getElementById(`item-${id}`);
+    if (targetItem) targetItem.classList.add('active');
+
+    // 부드러운 전환 효과
+    mainAvatar.style.opacity = '0.3';
     
-    // 이미지 로드 시점 조절
     setTimeout(() => {
         mainAvatar.src = imagePath;
-        mainAvatar.onload = () => {
-            mainAvatar.style.opacity = 1;
+        mainAvatar.onload = () => { mainAvatar.style.opacity = '1'; };
+        mainAvatar.onerror = () => { 
+            mainAvatar.src = 'https://via.placeholder.com/500x700?text=Image+Not+Found';
+            mainAvatar.style.opacity = '1';
         };
     }, 150);
 }
 
-// 5. 최종 적용 버튼 클릭 시
+// 최종 적용 버튼
 function applySelection() {
-    const currentImg = document.getElementById('current-avatar').src;
-    alert("선택하신 스타일이 시뮬레이션에 적용되었습니다!");
-    console.log("적용된 이미지:", currentImg);
+    alert("사장님, 선택하신 스타일이 시스템에 최종 적용되었습니다!");
 }
