@@ -5,28 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>G-Collection Avatar Simulation</title>
     <style>
-        body { margin: 0; font-family: 'Pretendard', sans-serif; background: #f0f2f5; }
-        .main-container { display: flex; gap: 20px; padding: 20px; max-width: 1200px; margin: 0 auto; }
+        /* [디자인] 깔끔하고 전문적인 시뮬레이션 UI */
+        body { margin: 0; font-family: 'Malgun Gothic', sans-serif; background: #f4f7f9; color: #333; }
+        .main-container { display: flex; gap: 20px; padding: 25px; max-width: 1300px; margin: 0 auto; height: 90vh; }
         
-        /* 왼쪽 아바타 영역 */
-        .avatar-display { flex: 2; background: #fff; border-radius: 20px; padding: 30px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        #main-avatar-frame { min-height: 600px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fafafa; border-radius: 15px; }
-        #current-avatar { width: 100%; max-width: 500px; border-radius: 10px; transition: opacity 0.3s ease; }
+        /* 왼쪽 메인 화면 */
+        .avatar-display { flex: 1.5; background: #ffffff; border-radius: 20px; padding: 30px; text-align: center; box-shadow: 0 8px 25px rgba(0,0,0,0.08); display: flex; flex-direction: column; }
+        #main-avatar-frame { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fbfbfb; border: 1px solid #eee; border-radius: 15px; overflow: hidden; }
+        #current-avatar { width: 100%; height: 100%; object-fit: contain; transition: opacity 0.3s ease; }
         
-        /* 오른쪽 스타일 리스트 영역 */
-        .style-sidebar { flex: 1; background: #fff; padding: 20px; border-radius: 20px; height: 85vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        /* 오른쪽 스타일 리스트 */
+        .style-sidebar { flex: 0.8; background: #ffffff; padding: 25px; border-radius: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.08); overflow-y: auto; }
         .style-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
         
-        .style-item { border: 2px solid #eee; border-radius: 15px; cursor: pointer; transition: 0.3s; overflow: hidden; }
-        .style-item:hover { border-color: #4a90e2; transform: translateY(-3px); }
-        .style-item.active { border-color: #4a90e2; background: #f0f7ff; }
+        .style-item { border: 2px solid #f0f0f0; border-radius: 12px; cursor: pointer; transition: 0.3s; overflow: hidden; background: #fff; }
+        .style-item:hover { border-color: #4a90e2; transform: translateY(-2px); }
+        .style-item.active { border-color: #4a90e2; background: #eef6ff; }
         
-        .style-item img { width: 100%; height: 180px; object-fit: cover; display: block; }
-        .style-item span { display: block; font-size: 15px; font-weight: 600; padding: 12px; text-align: center; }
+        .style-item img { width: 100%; height: 150px; object-fit: cover; display: block; }
+        .style-item span { display: block; font-size: 15px; font-weight: bold; padding: 12px; text-align: center; }
 
-        .apply-btn { margin-top: 25px; padding: 18px 80px; background: #4a90e2; color: white; border: none; border-radius: 35px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .apply-btn:hover { background: #357abd; box-shadow: 0 5px 15px rgba(74,144,226,0.4); }
-        .label { margin-top: 15px; color: #bbb; font-weight: bold; font-size: 12px; letter-spacing: 2px; }
+        /* 하단 버튼 */
+        .apply-btn { margin-top: 25px; padding: 18px; background: #3478f6; color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .apply-btn:hover { background: #2359c4; }
+        .label { margin: 10px 0; color: #aaa; font-size: 12px; font-weight: bold; letter-spacing: 3px; }
     </style>
 </head>
 <body>
@@ -34,14 +36,14 @@
 <div class="main-container">
     <div class="avatar-display">
         <div id="main-avatar-frame">
-            <img id="current-avatar" src="style1.jpg" alt="Main Avatar" onerror="this.src='https://via.placeholder.com/500x700?text=G-Collection+Avatar'">
-            <p class="label">MAIN VIEW</p>
+            <img id="current-avatar" src="style1.jpg" alt="Main Avatar">
         </div>
+        <p class="label">MAIN VIEW</p>
         <button class="apply-btn" onclick="applySelection()">최종 적용하기</button>
     </div>
 
     <div class="style-sidebar">
-        <h3 style="margin-bottom:20px; color:#333;">스타일 추천 (8)</h3>
+        <h3 style="margin-top:0; border-bottom:2px solid #f4f4f4; padding-bottom:15px;">스타일 추천 (8)</h3>
         <div id="style-grid" class="style-grid">
             </div>
     </div>
