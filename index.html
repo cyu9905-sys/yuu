@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>제니 AI 옷입히기 - 드래그 앤 드롭</title>
+
+    <style>
+
+        body { background-color: #fff0f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: 'Pretendard', sans-serif; }
+
+        .game-wrapper { width: 800px; height: 600px; display: flex; background: white; border-radius: 30px; padding: 20px; box-shadow: 0 20px 50px rgba(255,105,180,0.3); border: 5px solid #ffb6c1; }
+
+       
+
+        /* 왼쪽: 캐릭터 배치 영역 */
+
+        .drop-zone { flex: 1; position: relative; display: flex; justify-content: center; align-items: center; background: #fff5f7; border-radius: 20px; border: 3px dashed #ffc0cb; transition: 0.3s; }
+
+        .drop-zone.drag-over { background: #ffe4e1; border-color: #ff69b4; transform: scale(1.02); }
+
+        #mainAvatar { height: 90%; border-radius: 15px; pointer-events: none; }
+
+        .drop-label { position: absolute; bottom: 10px; color: #ff69b4; font-weight: bold; }
+
+
+
+        /* 오른쪽: 옷장(드래그할 아이템들) */
+
+        .closet { width: 300px; padding-left: 20px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr); gap: 15px; }
+
+        .drag-item { border: 2px solid #eee; border-radius: 15px; cursor: grab; overflow: hidden; display: flex; flex-direction: column; align-items: center; background: #fff; transition: 0.2s; }
+
+        .drag-item:active { cursor: grabbing; opacity: 0.7; }
+
+        .drag-item:hover { border-color: #ff69b4; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+
+        .drag-item img { width: 100%; height: 80%; object-fit: cover; }
+
+        .drag-item span { font-size: 12px; padding: 5px; color: #666; }
+
+    </style>
+
+</head>
+
+<body>
+
+
+
+<div class="game-wrapper">
+
+    <div class="drop-zone" id="dropZone" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+
+        <img id="mainAvatar" src="기본_제니_이미지.png" alt="Jenny">
+
+        <div class="drop-label">여기에 옷을 끌어다 놓으세요!</div>
+
+    </div>
+
+
+
+    <div class="closet">
+
+        <div class="drag-item" draggable="true" ondragstart="drag(event)" data-img="캐주얼_제니.png">
+
+            <img src="캐주얼_아이콘.png"><span>캐주얼</span>
+
+        </div>
+
+        <div class="drag-item" draggable="true" ondragstart="drag(event)" data-img="오피스_제니.png">
+
+            <img src="오피스_아이콘.png"><span>오피스 룩</span>
+
+        </div>
+
+        <div class="drag-item" draggable="true" ondragstart="drag(event)" data-img="드레스_제니.png">
+
+            <img src="드레스_아이콘.png"><span>이브닝 드레스</span>
+
+        </div>
+
+        <div class="drag-item" draggable="true" ondragstart="drag(event)" data-img="운동복_제니.png">
+
+            <img src="운동복_아이콘.png"><span>액티브웨어</span>
+
+        </div>
+
+        <div class="drag-item" draggable="true" ondragstart="drag(event)" data-img="교복_제니.png">
+
+            <img src="교복_아이콘.png"><span>프레피 룩</span>
+
+        </div>
+
+        <div class="drag-item" draggable="true" ondragstart="drag(event)" data-img="겨울_제니.png">
+
+            <img src="겨울_아이콘.png"><span>윈터 레이어드</span>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+    // 드래그 허용
+
+    function allowDrop(ev) {
+
+        ev.preventDefault();
+
+        document.getElementById('dropZone').classList.add('drag-over');
+
+    }
+
+
+
+    // 드래그 영역을 벗어났을 때
+
+    function dragLeave(ev) {
+
+        document.getElementById('dropZone').classList.remove('drag-over');
+
+    }
+
+
+
+    // 드래그 시작 시 데이터 저장
+
+    function drag(ev) {
+
+        ev.dataTransfer.setData("newImg", ev.currentTarget.getAttribute('data-img'));
+
+    }
+
+
+
+    // 드롭 시 이미지 교체
+
+    function drop(ev) {
+
+        ev.preventDefault();
+
+        document.getElementById('dropZone').classList.remove('drag-over');
+
+       
+
+        const newImgUrl = ev.dataTransfer.getData("newImg");
+
+        const avatar = document.getElementById('mainAvatar');
+
+       
+
+        // 부드러운 교체 애니메이션
+
+        avatar.style.transition = "0.3s";
+
+        avatar.style.opacity = "0";
+
+       
+
+        setTimeout(() => {
+
+            avatar.src = newImgUrl;
+
+            avatar.style.opacity = "1";
+
+        }, 300);
+
+    }
+
+</script>
+
+
+
+</body>
+
+</html>
+
+
