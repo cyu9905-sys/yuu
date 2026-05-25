@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YOUBESHOP Gold Catch Game</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, #3b2a08 0%, #111 45%, #050505 100%);
+      font-family: Arial, 'Noto Sans KR', sans-serif;
+      color: #fff;
+      overflow: hidden;
+    }
+    .wrap {
+      width: min(94vw, 900px);
+      text-align: center;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(28px, 5vw, 54px);
+      letter-spacing: 1px;
+      color: #ffd56a;
+      text-shadow: 0 0 16px rgba(255, 213, 106, .7);
+    }
+    .subtitle {
+      margin: 0 0 18px;
+      color: #f5e6b8;
+      font-size: 16px;
+    }
+    .panel {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin: 0 auto 12px;
+      padding: 12px 16px;
+      border: 1px solid rgba(255, 213, 106, .35);
+      border-radius: 18px;
+      background: rgba(0,0,0,.35);
+      box-shadow: 0 12px 40px rgba(0,0,0,.35);
+    }
+    .panel strong { color: #ffd56a; }
+    button {
+      border: 0;
+      padding: 11px 18px;
+      border-radius: 999px;
+      font-weight: 800;
+      cursor: pointer;
+      color: #2b1800;
+      background: linear-gradient(135deg, #fff0aa, #ffbd33);
+      box-shadow: 0 7px 16px rgba(255, 189, 51, .25);
+    }
+    #game {
+      width: 100%;
+      height: min(62vh, 520px);
+      min-height: 420px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 26px;
+      border: 2px solid rgba(255, 213, 106, .55);
+      background:
+        linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px),
+        radial-gradient(circle at top, rgba(255, 213, 106, .25), transparent 38%),
+        linear-gradient(180deg, #201503, #090909 72%);
+      background-size: 36px 36px, 36px 36px, auto, auto;
+      box-shadow: inset 0 0 35px rgba(255, 213, 106, .15), 0 20px 55px rgba(0,0,0,.5);
+    }
+    #player {
+      width: 110px;
+      height: 42px;
+      position: absolute;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      border-radius: 18px 18px 28px 28px;
+      background: linear-gradient(135deg, #fff4b0, #c98716);
+      box-shadow: 0 0 20px rgba(255, 213, 106, .8);
+    }
+    #player::before {
+      content: 'YOUBESHOP';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 12px;
+      font-weight: 900;
+      color: #3b2100;
+    }
+    .item {
+      width: 46px;
+      height: 46px;
+      position: absolute;
+      top: -60px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      background: rgba(255, 255, 255, .12);
+      border: 1px solid rgba(255, 255, 255, .22);
+      box-shadow: 0 0 16px rgba(255,255,255,.16);
+      user-select: none;
+    }
+    .gold { background: linear-gradient(135deg, #fff5ad, #f4a51c); }
+    .bad { background: linear-gradient(135deg, #7b1d1d, #180202); }
+    .center-message {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,.42);
+      padding: 24px;
+    }
+    .center-message h2 {
+      margin: 0 0 10px;
+      font-size: 34px;
+      color: #ffd56a;
+    }
+    .center-message p {
+      max-width: 560px;
+      line-height: 1.6;
+      color: #f6eac5;
+    }
+    .hide { display: none; }
+    .guide {
+      margin-top: 12px;
+      color: #d9c58d;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>YOUBESHOP GOLD CATCH</h1>
+    <p class="subtitle">금빛 상품을 잡고, 오류 폭탄은 피하세요. 원팀 포에버!</p>
+
+    <div class="panel">
+      <div>점수: <strong id="score">0</strong></div>
+      <div>목숨: <strong id="life">3</strong></div>
+      <div>시간: <strong id="time">60</strong>초</div>
+      <button id="startBtn">게임 시작</button>
+    </div>
+
+    <div id="game">
+      <div id="player"></div>
+      <div id="message" class="center-message">
+        <h2>유비샵 세계통일 게임</h2>
+        <p>키보드 ← → 또는 마우스/손가락으로 바구니를 움직이세요.<br>🎁 금빛 상품은 +10점, 💣 오류 폭탄은 목숨 -1입니다.</p>
+        <button onclick="startGame()">시작하기</button>
+      </div>
+    </div>
+
+    <div class="guide">GitHub Pages용 단일 파일입니다. 파일명을 <strong>index.html</strong>로 저장하면 바로 실행됩니다.</div>
+  </div>
+
+  <script>
+    const game = document.getElementById('game');
+    const player = document.getElementById('player');
+    const scoreEl = document.getElementById('score');
+    const lifeEl = document.getElementById('life');
+    const timeEl = document.getElementById('time');
+    const message = document.getElementById('message');
+    const startBtn = document.getElementById('startBtn');
+
+    let score = 0;
+    let life = 3;
+    let time = 60;
+    let playerX = 0;
+    let speed = 7;
+    let running = false;
+    let spawnTimer = null;
+    let clockTimer = null;
+    let keys = {};
+
+    function setPlayerX(x) {
+      const max = game.clientWidth - player.clientWidth;
+      playerX = Math.max(0, Math.min(max, x));
+      player.style.left = playerX + 'px';
+      player.style.transform = 'none';
+    }
+
+    function resetGame() {
+      score = 0;
+      life = 3;
+      time = 60;
+      speed = 7;
+      running = true;
+      scoreEl.textContent = score;
+      lifeEl.textContent = life;
+      timeEl.textContent = time;
+      document.querySelectorAll('.item').forEach(el => el.remove());
+      setPlayerX((game.clientWidth - player.clientWidth) / 2);
+      message.classList.add('hide');
+    }
+
+    function startGame() {
+      clearInterval(spawnTimer);
+      clearInterval(clockTimer);
+      resetGame();
+      spawnTimer = setInterval(spawnItem, 650);
+      clockTimer = setInterval(() => {
+        time--;
+        timeEl.textContent = time;
+        if (time % 15 === 0) speed += 1;
+        if (time <= 0) endGame('성공! 유비샵 점수 ' + score + '점 달성!');
+      }, 1000);
+    }
+
+    function endGame(text) {
+      running = false;
+      clearInterval(spawnTimer);
+      clearInterval(clockTimer);
+      message.innerHTML = `
+        <h2>${text}</h2>
+        <p>최종 점수: <strong style="color:#ffd56a">${score}</strong><br>원팀 포에버, 유비샵 가즈아 ☕🚀</p>
+        <button onclick="startGame()">다시 시작</button>
+      `;
+      message.classList.remove('hide');
+    }
+
+    function spawnItem() {
+      if (!running) return;
+      const item = document.createElement('div');
+      const isBad = Math.random() < 0.24;
+      item.className = 'item ' + (isBad ? 'bad' : 'gold');
+      item.textContent = isBad ? '💣' : ['🎁','👜','👗','💎','⭐'][Math.floor(Math.random()*5)];
+      item.dataset.bad = isBad ? '1' : '0';
+      item.style.left = Math.random() * (game.clientWidth - 50) + 'px';
+      game.appendChild(item);
+
+      let y = -60;
+      const fall = setInterval(() => {
+        if (!running) {
+          clearInterval(fall);
+          item.remove();
+          return;
+        }
+        y += speed;
+        item.style.top = y + 'px';
+
+        const a = item.getBoundingClientRect();
+        const b = player.getBoundingClientRect();
+        const hit = a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+
+        if (hit) {
+          if (item.dataset.bad === '1') {
+            life--;
+            lifeEl.textContent = life;
+            if (life <= 0) endGame('아쉽습니다! 오류 폭탄에 당했습니다');
+          } else {
+            score += 10;
+            scoreEl.textContent = score;
+          }
+          clearInterval(fall);
+          item.remove();
+        }
+
+        if (y > game.clientHeight + 70) {
+          clearInterval(fall);
+          item.remove();
+        }
+      }, 24);
+    }
+
+    function loop() {
+      if (running) {
+        if (keys.ArrowLeft) setPlayerX(playerX - 10);
+        if (keys.ArrowRight) setPlayerX(playerX + 10);
+      }
+      requestAnimationFrame(loop);
+    }
+
+    window.addEventListener('keydown', e => keys[e.key] = true);
+    window.addEventListener('keyup', e => keys[e.key] = false);
+
+    game.addEventListener('mousemove', e => {
+      const rect = game.getBoundingClientRect();
+      setPlayerX(e.clientX - rect.left - player.clientWidth / 2);
+    });
+
+    game.addEventListener('touchmove', e => {
+      const rect = game.getBoundingClientRect();
+      const touch = e.touches[0];
+      setPlayerX(touch.clientX - rect.left - player.clientWidth / 2);
+      e.preventDefault();
+    }, { passive: false });
+
+    startBtn.addEventListener('click', startGame);
+    window.addEventListener('resize', () => setPlayerX((game.clientWidth - player.clientWidth) / 2));
+    setPlayerX((game.clientWidth - player.clientWidth) / 2);
+    loop();
+  
+    // =============================
+    // Sound Effects: no external files needed
+    // =============================
+    let audioCtx = null;
+    let soundOn = true;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function beep(freq = 440, duration = 0.08, type = 'sine', volume = 0.08) {
+      if (!soundOn || !audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.value = freq;
+      gain.gain.value = volume;
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+      osc.stop(audioCtx.currentTime + duration);
+    }
+
+    function playCatchSound() {
+      beep(660, 0.07, 'triangle', 0.09);
+      setTimeout(() => beep(880, 0.07, 'triangle', 0.08), 70);
+    }
+
+    function playBombSound() {
+      beep(130, 0.16, 'sawtooth', 0.10);
+      setTimeout(() => beep(90, 0.18, 'sawtooth', 0.08), 90);
+    }
+
+    function playStartSound() {
+      beep(440, 0.08, 'triangle', 0.07);
+      setTimeout(() => beep(660, 0.08, 'triangle', 0.07), 80);
+      setTimeout(() => beep(880, 0.12, 'triangle', 0.07), 160);
+    }
+
+    function playGameOverSound() {
+      beep(420, 0.12, 'square', 0.06);
+      setTimeout(() => beep(260, 0.16, 'square', 0.06), 130);
+      setTimeout(() => beep(180, 0.22, 'square', 0.06), 280);
+    }
+
+    const soundBtn = document.createElement('button');
+    soundBtn.textContent = '소리 ON';
+    soundBtn.style.marginLeft = '8px';
+    document.querySelector('.panel').appendChild(soundBtn);
+    soundBtn.addEventListener('click', () => {
+      initAudio();
+      soundOn = !soundOn;
+      soundBtn.textContent = soundOn ? '소리 ON' : '소리 OFF';
+      if (soundOn) beep(760, 0.08, 'triangle', 0.08);
+    });
+
+    const originalStartGame = startGame;
+    startGame = function() {
+      initAudio();
+      originalStartGame();
+      playStartSound();
+    };
+
+    const originalEndGame = endGame;
+    endGame = function(text) {
+      playGameOverSound();
+      originalEndGame(text);
+    };
+
+    const originalScoreDescriptor = Object.getOwnPropertyDescriptor(window, 'score');
+  </script>
+  <script>
+    // Patch hit sounds by observing score/life changes during play
+    let lastScoreForSound = 0;
+    let lastLifeForSound = 3;
+    setInterval(() => {
+      const currentScore = Number(scoreEl.textContent || 0);
+      const currentLife = Number(lifeEl.textContent || 3);
+      if (running && currentScore > lastScoreForSound) playCatchSound();
+      if (running && currentLife < lastLifeForSound) playBombSound();
+      lastScoreForSound = currentScore;
+      lastLifeForSound = currentLife;
+    }, 60);
+  </script>
+</body>
+</html>
