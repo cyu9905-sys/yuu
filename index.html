@@ -1,27 +1,341 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Clothing Simulator</title>
-    <style>
-        body { margin: 0; display: flex; flex-direction: column; align-items: center; background: #f0f0f0; font-family: sans-serif; }
-        #canvas-container { width: 100%; max-width: 800px; height: 500px; background: #fff; margin-top: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); position: relative; overflow: hidden; }
-        .controls { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; padding: 10px; }
-        .style-item { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; transition: opacity 0.3s; }
-        .style-item:hover { opacity: 0.8; }
-        .error-msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: red; display: none; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YOUBESHOP Styling Game</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, "Noto Sans KR", sans-serif;
+      background: linear-gradient(135deg, #111, #3a2a12, #000);
+      color: #fff;
+      text-align: center;
+      min-height: 100vh;
+    }
+
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 28px 16px 50px;
+    }
+
+    .logo {
+      font-size: 30px;
+      font-weight: 900;
+      color: #ffd56a;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+      text-shadow: 0 0 12px rgba(255, 213, 106, 0.45);
+    }
+
+    .sub-logo {
+      font-size: 15px;
+      color: #f5e2a6;
+      margin-bottom: 24px;
+    }
+
+    .game-card {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 213, 106, 0.35);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+      backdrop-filter: blur(8px);
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 34px;
+      color: #fff;
+    }
+
+    .desc {
+      color: #ddd;
+      line-height: 1.6;
+      margin-bottom: 22px;
+    }
+
+    .model-box {
+      width: 260px;
+      height: 350px;
+      margin: 20px auto;
+      border-radius: 28px;
+      background: linear-gradient(180deg, #f7d88b, #9a6a22);
+      position: relative;
+      box-shadow: inset 0 0 35px rgba(255,255,255,0.2), 0 18px 40px rgba(0,0,0,0.35);
+      overflow: hidden;
+    }
+
+    .head {
+      width: 78px;
+      height: 78px;
+      background: #ffe1bd;
+      border-radius: 50%;
+      position: absolute;
+      top: 34px;
+      left: 91px;
+      border: 4px solid rgba(255,255,255,0.5);
+    }
+
+    .hair {
+      width: 94px;
+      height: 55px;
+      background: #3a2415;
+      border-radius: 50px 50px 20px 20px;
+      position: absolute;
+      top: 25px;
+      left: 83px;
+    }
+
+    .body {
+      width: 120px;
+      height: 170px;
+      border-radius: 42px 42px 18px 18px;
+      position: absolute;
+      top: 120px;
+      left: 70px;
+      background: #ffffff;
+      transition: 0.35s;
+      border: 3px solid rgba(255,255,255,0.7);
+    }
+
+    .style-name {
+      font-size: 22px;
+      font-weight: 800;
+      color: #ffd56a;
+      margin-top: 10px;
+      min-height: 34px;
+    }
+
+    .recommend {
+      background: rgba(0,0,0,0.28);
+      border-radius: 16px;
+      padding: 15px;
+      margin: 16px auto 20px;
+      max-width: 600px;
+      color: #fff4c7;
+      line-height: 1.5;
+      min-height: 55px;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    button {
+      border: none;
+      border-radius: 18px;
+      padding: 16px 12px;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      background: linear-gradient(180deg, #ffe08a, #c99225);
+      color: #211600;
+      box-shadow: 0 8px 0 #7e5717, 0 14px 24px rgba(0,0,0,0.3);
+      transition: 0.15s;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.08);
+    }
+
+    button:active {
+      transform: translateY(5px);
+      box-shadow: 0 3px 0 #7e5717, 0 8px 16px rgba(0,0,0,0.3);
+    }
+
+    .sound-btn {
+      margin-top: 20px;
+      background: linear-gradient(180deg, #fff, #d8d8d8);
+      color: #111;
+      box-shadow: 0 8px 0 #888, 0 14px 24px rgba(0,0,0,0.3);
+    }
+
+    .footer {
+      margin-top: 28px;
+      color: #cfcfcf;
+      font-size: 14px;
+    }
+
+    .sparkle {
+      animation: sparkle 1.4s infinite alternate;
+    }
+
+    @keyframes sparkle {
+      from {
+        text-shadow: 0 0 8px #ffd56a;
+      }
+      to {
+        text-shadow: 0 0 25px #fff1a8, 0 0 45px #ffd56a;
+      }
+    }
+
+    @media (max-width: 680px) {
+      h1 {
+        font-size: 26px;
+      }
+
+      .buttons {
+        grid-template-columns: 1fr;
+      }
+
+      .model-box {
+        width: 230px;
+        height: 320px;
+      }
+
+      .head {
+        left: 76px;
+      }
+
+      .hair {
+        left: 68px;
+      }
+
+      .body {
+        left: 55px;
+      }
+    }
+  </style>
 </head>
+
 <body>
+  <div class="wrap">
+    <div class="logo sparkle">YOUBESHOP</div>
+    <div class="sub-logo">Ariel's Styling Time · youbeshop.com</div>
 
-    <div id="canvas-container">
-        <div id="error-msg" class="error-msg">이미지를 불러올 수 없습니다.</div>
-        </div>
+    <div class="game-card">
+      <h1>유비샵 스타일링 게임</h1>
+      <p class="desc">
+        원하는 스타일 버튼을 누르면 모델 의상이 바뀌고,<br />
+        아리엘이 어울리는 상품 추천 메시지를 보여줍니다.
+      </p>
 
-    <div class="controls" id="style-controls">
-        </div>
+      <div class="model-box">
+        <div class="hair"></div>
+        <div class="head"></div>
+        <div class="body" id="clothes"></div>
+      </div>
 
-    <script src="1.js"></script>
+      <div class="style-name" id="styleName">스타일을 선택하세요</div>
+
+      <div class="recommend" id="recommendText">
+        오늘의 추천을 기다리고 있어요. 버튼을 눌러보세요.
+      </div>
+
+      <div class="buttons">
+        <button onclick="changeStyle('daily')">데일리룩</button>
+        <button onclick="changeStyle('wedding')">웨딩룩</button>
+        <button onclick="changeStyle('luxury')">럭셔리룩</button>
+        <button onclick="changeStyle('travel')">여행룩</button>
+        <button onclick="changeStyle('sport')">스포츠룩</button>
+        <button onclick="changeStyle('party')">파티룩</button>
+      </div>
+
+      <button class="sound-btn" onclick="toggleSound()" id="soundBtn">
+        🔊 소리 켜기
+      </button>
+    </div>
+
+    <div class="footer">
+      원팀 포에버 · 유비샵 가즈아 ☕🚀
+    </div>
+  </div>
+
+  <script>
+    let soundOn = false;
+    let audioCtx = null;
+
+    function playClickSound() {
+      if (!soundOn) return;
+
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+
+      const oscillator = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      oscillator.type = "sine";
+      oscillator.frequency.setValueAtTime(660, audioCtx.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(990, audioCtx.currentTime + 0.08);
+
+      gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.18);
+
+      oscillator.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      oscillator.start();
+      oscillator.stop(audioCtx.currentTime + 0.18);
+    }
+
+    function toggleSound() {
+      soundOn = !soundOn;
+      const soundBtn = document.getElementById("soundBtn");
+
+      if (soundOn) {
+        soundBtn.innerText = "🔇 소리 끄기";
+        playClickSound();
+      } else {
+        soundBtn.innerText = "🔊 소리 켜기";
+      }
+    }
+
+    function changeStyle(type) {
+      const clothes = document.getElementById("clothes");
+      const styleName = document.getElementById("styleName");
+      const recommendText = document.getElementById("recommendText");
+
+      playClickSound();
+
+      if (type === "daily") {
+        clothes.style.background = "linear-gradient(180deg, #ffffff, #b7d7ff)";
+        styleName.innerText = "데일리룩";
+        recommendText.innerText = "깔끔한 셔츠, 니트, 데님 팬츠와 잘 어울리는 everyday 스타일입니다.";
+      }
+
+      if (type === "wedding") {
+        clothes.style.background = "linear-gradient(180deg, #fff8e8, #f1d59b)";
+        styleName.innerText = "웨딩룩";
+        recommendText.innerText = "아리엘 감성의 우아한 드레스 스타일입니다. 특별한 날 추천합니다.";
+      }
+
+      if (type === "luxury") {
+        clothes.style.background = "linear-gradient(180deg, #111111, #d4af37)";
+        styleName.innerText = "럭셔리룩";
+        recommendText.innerText = "골드 포인트와 블랙 컬러가 어울리는 프리미엄 스타일입니다.";
+      }
+
+      if (type === "travel") {
+        clothes.style.background = "linear-gradient(180deg, #9be7ff, #1f8f5f)";
+        styleName.innerText = "여행룩";
+        recommendText.innerText = "가방, 편한 신발, 가벼운 아우터와 잘 맞는 여행 추천 코디입니다.";
+      }
+
+      if (type === "sport") {
+        clothes.style.background = "linear-gradient(180deg, #ff8a8a, #3737ff)";
+        styleName.innerText = "스포츠룩";
+        recommendText.innerText = "활동성이 좋은 트레이닝복, 운동화, 캐주얼 아이템 추천 스타일입니다.";
+      }
+
+      if (type === "party") {
+        clothes.style.background = "linear-gradient(180deg, #ff4fd8, #4b0082)";
+        styleName.innerText = "파티룩";
+        recommendText.innerText = "화려한 컬러와 반짝이는 액세서리가 어울리는 파티 스타일입니다.";
+      }
+    }
+  </script>
 </body>
 </html>
